@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rolepermissions',
     'usuarios',
+    'oraculo',
 ]
 
 ROLEPERMISSIONS_MODULE = 'core.roles'
