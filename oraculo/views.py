@@ -2,6 +2,14 @@ from django.shortcuts import render,redirect
 from .models import Treinamentos
 from django_q.models import Task
 from django.views.decorators.csrf import csrf_exempt
+from .models import DataTreinamento
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_community.vectorstores import FAISS
+from pathlib import Path
+from django.http import StreamingHttpResponse
+from django.conf import settings
+from django.http import JsonResponse
+from .models import Pergunta
 
 def treinar_ia(request):
     if request.method == 'GET':
@@ -23,9 +31,6 @@ def treinar_ia(request):
         
         return redirect('treinar_ia')
 
-from django.http import JsonResponse
-from .models import Pergunta
-
 @csrf_exempt
 def chat(request):
     if request.method == 'GET':
@@ -39,14 +44,6 @@ def chat(request):
         pergunta.save()
 
         return JsonResponse({'id': pergunta.id})
-    
-    
-from .models import DataTreinamento
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain_community.vectorstores import FAISS
-from pathlib import Path
-from django.http import StreamingHttpResponse
-from django.conf import settings
 
 @csrf_exempt
 def stream_response(request):
@@ -62,6 +59,7 @@ def stream_response(request):
                 metadata=doc.metadata,
                 texto=doc.page_content
             )
+            dt.save()
             pergunta.data_treinamento.add(dt)
 
         contexto = "\n\n".join([
